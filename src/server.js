@@ -1,0 +1,25 @@
+import 'dotenv/config';
+import http from 'http';
+import app from './app.js';
+import { connectDB } from './config/db.js';
+import { initSocket } from './config/socket.js';
+import { initRedis } from './config/cache.js';
+
+const PORT = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+
+// Initialize Socket.io attached to the native HTTP server
+initSocket(server);
+
+// Initialize Redis for caching
+initRedis();
+
+connectDB().then(async () => {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('Failed to connect to DB', err);
+  process.exit(1);
+});
