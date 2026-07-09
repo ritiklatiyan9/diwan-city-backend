@@ -27,6 +27,10 @@ import approvalRoutes from './approval.routes.js';
 import chatRoutes from './chat.routes.js';
 import vendorRoutes from './vendor.routes.js';
 import dashboardPermissionRoutes from './dashboardPermission.routes.js';
+import { verifyReceipt } from '../controllers/verifyReceipt.controller.js';
+
+// Public: verify any receipt QR (expense, vendor, plot, commission, daybook...) — no auth.
+router.get('/verify-receipt', verifyReceipt);
 
 router.use('/auth', authRoutes);
 router.use('/upload', uploadRoutes);
