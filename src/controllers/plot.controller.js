@@ -298,7 +298,7 @@ const maybeAutoCreatePlotRegistry = async ({ plot, createdBy, registryFields = {
 
 /** POST /plots — Create a new plot */
 export const createPlot = asyncHandler(async (req, res) => {
-  const { site_id, plot_no, block, buyer_name, plot_size, plot_size_mtr, plot_rate, sale_price, registry_area, circle_rate, to_receive_bank, first_installment, booking_by, booking_date, status, notes, plc_charges, team, assigned_admin_id, commission_enabled, commission_type, commission_value, commission_rate, plot_commission, force_duplicate } = req.body;
+  const { site_id, plot_no, block, buyer_name, plot_size, plot_size_mtr, plot_rate, sale_price, company_price, party_price, registry_area, circle_rate, to_receive_bank, first_installment, booking_by, booking_date, status, notes, plc_charges, team, assigned_admin_id, commission_enabled, commission_type, commission_value, commission_rate, plot_commission, force_duplicate } = req.body;
 
   if (!site_id) return res.status(400).json({ message: 'Site is required' });
   if (!plot_no || !plot_no.trim()) return res.status(400).json({ message: 'Plot number is required' });
@@ -347,6 +347,8 @@ export const createPlot = asyncHandler(async (req, res) => {
     plot_size_mtr: parseFloat(plot_size_mtr) || null,
     plot_rate: parseFloat(plot_rate) || null,
     sale_price: parseFloat(sale_price) || 0,
+    company_price: parseFloat(company_price) || 0,
+    party_price: parseFloat(party_price) || 0,
     registry_area: parseFloat(registry_area) || 0,
     circle_rate: parseFloat(circle_rate) || 0,
     to_receive_bank: parseFloat(to_receive_bank) || 0,
@@ -453,7 +455,7 @@ export const getPlot = asyncHandler(async (req, res) => {
 /** PUT /plots/:id — Update plot details */
 export const updatePlot = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { plot_no, block, buyer_name, plot_size, plot_size_mtr, plot_rate, sale_price, registry_area, circle_rate, to_receive_bank, first_installment, booking_by, booking_date, status, notes, plc_charges, team, assigned_admin_id, commission_enabled, commission_type, commission_value, commission_rate, plot_commission, original_plot_rate, discount_rate } = req.body;
+  const { plot_no, block, buyer_name, plot_size, plot_size_mtr, plot_rate, sale_price, company_price, party_price, registry_area, circle_rate, to_receive_bank, first_installment, booking_by, booking_date, status, notes, plc_charges, team, assigned_admin_id, commission_enabled, commission_type, commission_value, commission_rate, plot_commission, original_plot_rate, discount_rate } = req.body;
 
   const existing = await plotModel.findById(parseInt(id), pool);
   if (!existing) return res.status(404).json({ message: 'Plot not found' });
@@ -473,6 +475,8 @@ export const updatePlot = asyncHandler(async (req, res) => {
   if (plot_size_mtr !== undefined) updateData.plot_size_mtr = parseFloat(plot_size_mtr) || null;
   if (plot_rate !== undefined) updateData.plot_rate = parseFloat(plot_rate) || null;
   if (sale_price !== undefined) updateData.sale_price = parseFloat(sale_price) || 0;
+  if (company_price !== undefined) updateData.company_price = parseFloat(company_price) || 0;
+  if (party_price !== undefined) updateData.party_price = parseFloat(party_price) || 0;
   if (registry_area !== undefined) updateData.registry_area = parseFloat(registry_area) || 0;
   if (circle_rate !== undefined) updateData.circle_rate = parseFloat(circle_rate) || 0;
   if (to_receive_bank !== undefined) updateData.to_receive_bank = parseFloat(to_receive_bank) || 0;
