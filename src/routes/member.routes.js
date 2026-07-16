@@ -4,6 +4,7 @@ const router = express.Router();
 import {
   createMember, listMembers, searchMembers, getMemberAutocomplete,
   getMember, updateMember, deleteMember, getMemberTransactions, getMemberFinancialInfo,
+  getMemberLedger,
 } from '../controllers/member.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import requireRole from '../middlewares/role.middleware.js';
@@ -54,6 +55,8 @@ router.delete('/:id', requireRole('admin', 'sub_admin'), requirePermission('clie
 // Member transactions
 router.get('/:id/transactions', requireRole('admin', 'sub_admin'), requirePermission('clients', 'read'), memberReadCache, getMemberTransactions);
 router.get('/:id/financial-info', requireRole('admin', 'sub_admin'), requirePermission('clients', 'read'), memberReadCache, getMemberFinancialInfo);
+// Full cross-module money ledger for one member
+router.get('/:id/ledger', requireRole('admin', 'sub_admin'), requirePermission('clients', 'read'), memberReadCache, getMemberLedger);
 
 // Dynamic param last
 router.get('/:id', requireRole('admin', 'sub_admin'), requirePermission('clients', 'read'), memberReadCache, getMember);
