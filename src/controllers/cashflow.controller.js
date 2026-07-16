@@ -122,16 +122,40 @@ export const getMonth = asyncHandler(async (req, res) => {
 
 /**
  * PUT /cashflow/months/:id
- * Update month (opening balance, notes, lock)
+ * Update month (ledger name, opening balance, notes, lock)
  */
 export const updateMonth = asyncHandler(async (req, res) => {
   const monthId = parseInt(req.params.id);
-  const { opening_balance, notes, is_locked } = req.body;
+  const { ledger_name, opening_balance, notes, is_locked } = req.body;
 
   const updateData = {};
   if (opening_balance !== undefined) updateData.opening_balance = parseFloat(opening_balance) || 0;
   if (notes !== undefined) updateData.notes = notes ? notes.trim() : null;
   if (is_locked !== undefined) updateData.is_locked = Boolean(is_locked);
+
+  // Renaming a ledger. Normalised the same way createMonth does, and checked
+  // against the same (site_id, month, year, ledger_name) identity — otherwise a
+  // rename can collide with an existing ledger, which createMonth forbids.
+  if (ledger_name !== undefined) {
+    const trimmed = String(ledger_name).trim().toUpperCase();
+    if (!trimmed) return res.status(400).json({ message: 'Ledger name is required' });
+
+    const existing = await pool.query(
+      `SELECT site_id, month, year FROM cash_flow_months WHERE id = $1`,
+      [monthId]
+    );
+    if (!existing.rows[0]) return res.status(404).json({ message: 'Cash flow month not found' });
+
+    const dup = await pool.query(
+      `SELECT id FROM cash_flow_months
+        WHERE site_id = $1 AND month = $2 AND year = $3 AND UPPER(ledger_name) = $4 AND id <> $5
+        LIMIT 1`,
+      [existing.rows[0].site_id, existing.rows[0].month, existing.rows[0].year, trimmed, monthId]
+    );
+    if (dup.rows[0]) return res.status(409).json({ message: `A ledger named "${trimmed}" already exists` });
+
+    updateData.ledger_name = trimmed;
+  }
 
   if (Object.keys(updateData).length === 0) {
     return res.status(400).json({ message: 'Nothing to update' });
