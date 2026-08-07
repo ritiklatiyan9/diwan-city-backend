@@ -5,7 +5,7 @@ const ALL_MODULES = [
     'dashboard', 'clients', 'vendors', 'farmers', 'commissions', 'daybook',
     'cashflow', 'firm_transactions', 'plot_payments', 'plot_registry',
     'expenses', 'imprest', 'reports', 'settings', 'chat', 'excel',
-    'expense_approval',
+    'expense_approval', 'interest',
 ];
 
 class PermissionModel {
